@@ -1,10 +1,15 @@
 // ==UserScript==
 // @name         hackahackernews
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @author       Rasz_pl (citizenr@gmail.com)
 // @description  Comment system enthancement. Highlights new comments/stories, marks stories you visited.
 //               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
+// @homepageURL  https://github.com/raszpl/hackahackernews
+// @author       Rasz_pl
+// @version      0.2
+// @date         2018-04-09
+// @namespace    https://github.com/raszpl/hackahackernews
+// @contact      citizenr@gmail.com
+// @license      MIT; http://opensource.org/licenses/MIT
+// @supportURL   https://github.com/raszpl/hackahackernews
 // @match        https://news.ycombinator.com/*
 // @grant        none
 // ==/UserScript==
@@ -18,7 +23,6 @@ head = document.head || document.getElementsByTagName('head')[0];
 style = document.createElement('style');
 style.type = 'text/css';
 style.appendChild(document.createTextNode(css));
-//    console.log(style);
 head.appendChild(style);
 
 switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
@@ -68,5 +72,3 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
   case "reply":
     break;
 }
-
-
