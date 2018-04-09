@@ -25,17 +25,22 @@ style.type = 'text/css';
 style.appendChild(document.createTextNode(css));
 head.appendChild(style);
 
-switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
+switch(document.getElementsByTagName('html')[0].getAttribute('op'))
+{
   case "news":
     var aaa = Array.prototype.map.call(document.querySelectorAll('.athing:not(.comtr)'), function(x) {  return x.id; });
-    for (var i = 0, len = aaa.length; i < len; i++) {
-      if (!localStorage.getItem(aaa[i])) {
+    for (var i = 0, len = aaa.length; i < len; i++)
+    {
+      if (!localStorage.getItem(aaa[i]))
+      {
         document.getElementById(aaa[i]).className +=" notseen";
         localStorage.setItem(aaa[i], 1);
       }
-      else if (parseInt(localStorage.getItem(aaa[i]).split(' ')[0])>1) {
+      else if (parseInt(localStorage.getItem(aaa[i]).split(' ')[0])>1)
+      {
         document.getElementById(aaa[i]).className +=" seenread";
-        if (parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML) > parseInt(localStorage.getItem(aaa[i]).split(' ')[1])) {
+        if (parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML) > parseInt(localStorage.getItem(aaa[i]).split(' ')[1]))
+        {
           var fresh = parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML) - parseInt(localStorage.getItem(aaa[i]).split(' ')[1]);
           document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML += '<a class="newcomments"><b> '+fresh+' new</b></a>';
         }
@@ -47,10 +52,33 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
     var stored = localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) ? localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) : "1 0";
     var max = parseInt(stored.split(' ')[0]);
     var aaa = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) {  return x.id; });
-    for (var i = 0, len = aaa.length; i < len; i++) {
-      if (aaa[i]>max) {
+
+    var nextcommenthash = false;
+    var i = aaa.length;
+    while(i--)
+    {
+      if (aaa[i]>max)
+      {
+        if (nextcommenthash)
+        {
+          var font= document.createElement("a");
+          font.setAttribute('style', 'border:1px solid red; color:red; width: 100%; text-align: center; display:block;');
+          font.textContent = "Next";
+          font.href = location.href.replace(location.hash,"") +"#"+nextcommenthash;
+          // OPTIONAL: document.body.scrollTop -= 200 lets me scroll a little bit down instead of sliding to top of hash
+          font.setAttribute('next-unread', nextcommenthash);
+          font.onclick = function() {window.location.hash = this.getAttribute('next-unread'); document.body.scrollTop -= 400; return false; };
+          document.getElementById(aaa[i]).appendChild(font);
+        }
+
         document.getElementById(aaa[i]).className +=" newcomment";
+        nextcommenthash = aaa[i];
       }
+    }
+    if (nextcommenthash)
+    {
+      window.location.hash = nextcommenthash;
+      document.body.scrollTop -= 400;
     }
     max = Math.max.apply(Math,aaa.concat([1]));
     var comment = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) {  return x.id; }).length;
@@ -60,8 +88,10 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
   case "threads":
     var max = parseInt(localStorage.getItem("mine"));
     var aaa = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) {  return x.id; });
-    for (var i = 0, len = aaa.length; i < len; i++) {
-      if (aaa[i]>max) {
+    for (var i = 0, len = aaa.length; i < len; i++)
+    {
+      if (aaa[i]>max)
+      {
         document.getElementById(aaa[i]).className +=" newcomment";
       }
     }
