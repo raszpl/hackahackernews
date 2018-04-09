@@ -2,14 +2,15 @@
 // @name         hackahackernews
 // @description  Comment system enthancement. Highlights new comments/stories, marks stories you visited.
 //               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
-// @homepageURL  https://github.com/raszpl/hackahackernews
 // @author       Rasz_pl
 // @version      0.2
 // @date         2018-04-09
 // @namespace    https://github.com/raszpl/hackahackernews
 // @contact      citizenr@gmail.com
 // @license      MIT; http://opensource.org/licenses/MIT
-// @supportURL   https://github.com/raszpl/hackahackernews
+// @homepageURL  https://github.com/raszpl/hackahackernews
+// @supportURL   https://github.com/raszpl/hackahackernews/issues
+// @downloadURL  https://github.com/raszpl/hackahackernews/raw/master/hackahackernews.user.js
 // @match        https://news.ycombinator.com/*
 // @grant        none
 // ==/UserScript==
