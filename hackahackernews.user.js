@@ -1,79 +1,80 @@
 // ==UserScript==
 // @name         hackahackernews
-// @description  Comment system enthancement. Highlights new comments/stories, marks stories you visited.
+// @description  Comment system enthancement. Highlights new comments/stories, marks stories you visited, adds "jump to new comment" links.
 //               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
+// @homepageURL  https://github.com/raszpl/hackahackernews
 // @author       Rasz_pl
-// @version      0.2
-// @date         2018-04-09
+// @version      0.3
+// @date         2018-06-26
 // @namespace    https://github.com/raszpl/hackahackernews
 // @contact      citizenr@gmail.com
-// @license      MIT; http://opensource.org/licenses/MIT
-// @homepageURL  https://github.com/raszpl/hackahackernews
-// @supportURL   https://github.com/raszpl/hackahackernews/issues
-// @downloadURL  https://github.com/raszpl/hackahackernews/raw/master/hackahackernews.user.js
+// @license      GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+// @supportURL   https://github.com/raszpl/hackahackernews
 // @match        https://news.ycombinator.com/*
 // @grant        none
 // ==/UserScript==
 
-css = '.notseen {background-color: #dff0d8 !important;}';
+let css = '.notseen {background-color: #dff0d8 !important;}';
 css += ' .seenread {background-color: #d0a5bd !important;}';
 css += ' .newcomments {color: #d00000 !important;}';
 css += ' .newcomment {background-color: rgba(255, 149, 40, 0.16) !important; border: 2px solid red !important;}';
+css += ' .nextcomment {border: 1px solid red; color: red !important; width: 100%; text-align: center; display: block;}';
 css += 'table.comment-tree { border-collapse: collapse; }';
-head = document.head || document.getElementsByTagName('head')[0];
-style = document.createElement('style');
+let head = document.head || document.getElementsByTagName('head')[0];
+let style = document.createElement('style');
 style.type = 'text/css';
 style.appendChild(document.createTextNode(css));
 head.appendChild(style);
 
+let itemarray, maxpost;
+let stored, nextcommenthash, comment;
 switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 {
   case "news":
-    var aaa = Array.prototype.map.call(document.querySelectorAll('.athing:not(.comtr)'), function(x) {  return x.id; });
-    for (var i = 0, len = aaa.length; i < len; i++)
+    itemarray = Array.prototype.map.call(document.querySelectorAll('.athing:not(.comtr)'), function(x) { return x.id; });
+    for (let i = 0; i < itemarray.length; i++)
     {
-      if (!localStorage.getItem(aaa[i]))
+      if (!localStorage.getItem(itemarray[i]))
       {
-        document.getElementById(aaa[i]).className +=" notseen";
-        localStorage.setItem(aaa[i], 1);
+        document.getElementById(itemarray[i]).className +=" notseen";
+        localStorage.setItem(itemarray[i], 1);
       }
-      else if (parseInt(localStorage.getItem(aaa[i]).split(' ')[0])>1)
+      else if (parseInt(localStorage.getItem(itemarray[i]).split(' ')[0])>1)
       {
-        document.getElementById(aaa[i]).className +=" seenread";
-        if (parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML) > parseInt(localStorage.getItem(aaa[i]).split(' ')[1]))
+        document.getElementById(itemarray[i]).className +=" seenread";
+        if (parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+itemarray[i]+'"]')[0].innerHTML) > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]))
         {
-          var fresh = parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML) - parseInt(localStorage.getItem(aaa[i]).split(' ')[1]);
-          document.querySelectorAll('.subtext > a[href^="item?id='+aaa[i]+'"]')[0].innerHTML += '<a class="newcomments"><b> '+fresh+' new</b></a>';
+          let fresh = parseInt(document.querySelectorAll('.subtext > a[href^="item?id='+itemarray[i]+'"]')[0].innerHTML) - parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]);
+          document.querySelectorAll('.subtext > a[href^="item?id='+itemarray[i]+'"]')[0].innerHTML += '<a class="newcomments"><b> '+fresh+' new</b></a>';
         }
       }
     }
     break;
 
   case "item":
-    var stored = localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) ? localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) : "1 0";
-    var max = parseInt(stored.split(' ')[0]);
-    var aaa = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) {  return x.id; });
+    stored = localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) ? localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) : "1 0";
+    maxpost = parseInt(stored.split(' ')[0]);
+    itemarray = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; });
 
-    var nextcommenthash = false;
-    var i = aaa.length;
-    while(i--)
+    nextcommenthash = false;
+    for (let i = itemarray.length; i >= 0; i--)
     {
-      if (aaa[i]>max)
+      if (itemarray[i]>maxpost)
       {
         if (nextcommenthash)
         {
-          var font= document.createElement("a");
-          font.setAttribute('style', 'border:1px solid red; color:red; width: 100%; text-align: center; display:block;');
+          let font= document.createElement("a");
+          font.className = "nextcomment";
           font.textContent = "Next";
           font.href = location.href.replace(location.hash,"") +"#"+nextcommenthash;
-          // OPTIONAL: document.body.scrollTop -= 200 lets me scroll a little bit down instead of sliding to top of hash
           font.setAttribute('next-unread', nextcommenthash);
-          font.onclick = function() {window.location.hash = this.getAttribute('next-unread'); document.body.scrollTop -= 400; return false; };
-          document.getElementById(aaa[i]).appendChild(font);
+          // OPTIONAL: document.body.scrollTop -= e.clientY-10 lets me scroll just about to the same spot under nextcommenthash instead of sliding to top of screen
+          font.onclick = function(e) {window.location.hash = this.getAttribute('next-unread'); document.body.scrollTop -= e.clientY -10; return false; };
+          document.getElementById(itemarray[i]).appendChild(font);
         }
 
-        document.getElementById(aaa[i]).className +=" newcomment";
-        nextcommenthash = aaa[i];
+        document.getElementById(itemarray[i]).className +=" newcomment";
+        nextcommenthash = itemarray[i];
       }
     }
     if (nextcommenthash)
@@ -81,23 +82,23 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
       window.location.hash = nextcommenthash;
       document.body.scrollTop -= 400;
     }
-    max = Math.max.apply(Math,aaa.concat([1]));
-    var comment = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) {  return x.id; }).length;
-    localStorage.setItem(document.querySelectorAll('.athing:not(.comtr)')[0].id, max +" "+comment);
+    maxpost = Math.max.apply(Math,itemarray.concat([1]));
+    comment = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; }).length;
+    localStorage.setItem(document.querySelectorAll('.athing:not(.comtr)')[0].id, maxpost +" "+comment);
     break;
 
   case "threads":
-    var max = parseInt(localStorage.getItem("mine"));
-    var aaa = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) {  return x.id; });
-    for (var i = 0, len = aaa.length; i < len; i++)
+    maxpost = parseInt(localStorage.getItem("mine"));
+    itemarray = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; });
+    for (let i = 0; i < itemarray.length; i++)
     {
-      if (aaa[i]>max)
+      if (itemarray[i]>maxpost)
       {
-        document.getElementById(aaa[i]).className +=" newcomment";
+        document.getElementById(itemarray[i]).className +=" newcomment";
       }
     }
-    max = (max > Math.max.apply(Math,aaa.concat([1]))) ? max : Math.max.apply(Math,aaa.concat([1]));
-    localStorage.setItem("mine", max);
+    maxpost = (maxpost > Math.max.apply(Math,itemarray.concat([1]))) ? maxpost : Math.max.apply(Math,itemarray.concat([1]));
+    localStorage.setItem("mine", maxpost);
     break;
 
   case "reply":
