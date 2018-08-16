@@ -4,7 +4,7 @@
 //               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL  https://github.com/raszpl/hackahackernews
 // @author       Rasz_pl
-// @version      0.3
+// @version      0.4
 // @date         2018-06-26
 // @namespace    https://github.com/raszpl/hackahackernews
 // @contact      citizenr@gmail.com
@@ -15,10 +15,10 @@
 // ==/UserScript==
 
 let css = '.notseen {background-color: #dff0d8 !important;}';
-css += ' .seenread {background-color: #d0a5bd !important;}';
-css += ' .newcomments {color: #d00000 !important;}';
-css += ' .newcomment {background-color: rgba(255, 149, 40, 0.16) !important; border: 2px solid red !important;}';
-css += ' .nextcomment {border: 1px solid red; color: red !important; width: 100%; text-align: center; display: block;}';
+css += '.seenread {background-color: #d0a5bd !important;}';
+css += '.newcomments {color: #d00000 !important;}';
+css += '.newcomment {background-color: rgba(255, 149, 40, 0.16) !important; border: 2px solid red !important;}';
+css += '.nextcomment {border: 1px solid red; color: red !important; width: 100%; text-align: center; display: block;}';
 css += 'table.comment-tree { border-collapse: collapse; }';
 let head = document.head || document.getElementsByTagName('head')[0];
 let style = document.createElement('style');
@@ -68,8 +68,11 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
           font.textContent = "Next";
           font.href = location.href.replace(location.hash,"") +"#"+nextcommenthash;
           font.setAttribute('next-unread', nextcommenthash);
-          // OPTIONAL: document.body.scrollTop -= e.clientY-10 lets me scroll just about to the same spot under nextcommenthash instead of sliding to top of screen
-          font.onclick = function(e) {window.location.hash = this.getAttribute('next-unread'); document.body.scrollTop -= e.clientY -10; return false; };
+          font.onclick = function(e) {
+            document.getElementById(this.getAttribute('next-unread')).classList.remove("noshow");
+            document.body.scrollTop += parseInt(document.getElementById(this.getAttribute('next-unread')).getBoundingClientRect().top) - e.clientY + 10;
+            return false;
+          };
           document.getElementById(itemarray[i]).appendChild(font);
         }
 
