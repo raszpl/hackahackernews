@@ -42,7 +42,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
       else if (parseInt(localStorage.getItem(itemarray[i]).split(' ')[0])>1)
       {
         document.getElementById(itemarray[i]).className +=" seenread";
-        if (parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1])) {
+        if (parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]))
         {
           let fresh = parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) - parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]);
           document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerHTML += ' <a class="hhn_newcomments"><b>'+fresh+' new</b></a>';
