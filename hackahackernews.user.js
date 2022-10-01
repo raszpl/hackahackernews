@@ -4,8 +4,8 @@
 //               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL  https://github.com/raszpl/hackahackernews
 // @author       Rasz_pl
-// @version      0.4
-// @date         2018-06-26
+// @version      0.5
+// @date         2022-09-29
 // @namespace    https://github.com/raszpl/hackahackernews
 // @contact      citizenr@gmail.com
 // @license      GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
