@@ -4,7 +4,7 @@
 //               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL  https://github.com/raszpl/hackahackernews
 // @author       Rasz_pl
-// @version      0.6
+// @version      0.6.1
 // @date         2022-09-29
 // @namespace    https://github.com/raszpl/hackahackernews
 // @contact      citizenr@gmail.com
@@ -45,7 +45,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
         if (parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]))
         {
           let fresh = parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) - parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]);
-          document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerHTML += ' <a class="hhn_newcomments"><b>'+fresh+' new</b></a>';
+          document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerHTML += ' <a class="newcomments"><b>'+fresh+' new</b></a>';
         }
       }
     }
