@@ -1,15 +1,14 @@
 // ==UserScript==
 // @name         hackahackernews
-// @description  Comment system enthancement. Highlights new comments/stories, marks stories you visited, adds "jump to new comment" links.
-//               Uses localStorage to store IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
+// @description  Comment system enthancement. Highlights new comments/stories, marks stories you visited, adds "jump to new comment" links. localStorage stores IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL  https://github.com/raszpl/hackahackernews
-// @author       Rasz_pl
+// @author       Rasz_pl (citizenr@gmail.com)
 // @version      0.6.1
-// @date         2022-09-29
 // @namespace    https://github.com/raszpl/hackahackernews
-// @contact      citizenr@gmail.com
 // @license      GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-// @supportURL   https://github.com/raszpl/hackahackernews
+// @updateURL    https://github.com/raszpl/hackahackernews
+// @downloadURL  https://github.com/raszpl/hackahackernews
+// @supportURL   https://github.com/raszpl/hackahackernews/issues
 // @match        https://news.ycombinator.com/*
 // @grant        none
 // ==/UserScript==
