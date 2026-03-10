@@ -19,11 +19,8 @@ css += '.newcomments {color: #d00000 !important;}';
 css += '.newcomment {background-color: rgba(255, 149, 40, 0.16) !important; border: 2px solid red !important;}';
 css += '.nextcomment {border: 1px solid red; color: red !important; width: 100%; text-align: center; display: block;}';
 css += 'table.comment-tree { border-collapse: collapse; }';
-let head = document.head || document.getElementsByTagName('head')[0];
-let style = document.createElement('style');
-style.type = 'text/css';
-style.appendChild(document.createTextNode(css));
-head.appendChild(style);
+
+GM_addStyle(css);
 
 let itemarray, maxpost;
 let stored, nextcommenthash, comment;
