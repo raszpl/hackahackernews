@@ -10,7 +10,7 @@
 // @downloadURL  https://github.com/raszpl/hackahackernews
 // @supportURL   https://github.com/raszpl/hackahackernews/issues
 // @match        https://news.ycombinator.com/*
-// @grant        none
+// @grant		GM_addStyle
 // ==/UserScript==
 
 let css = '.notseen {background-color: #dff0d8 !important;}';
@@ -19,12 +19,10 @@ css += '.newcomments {color: #d00000 !important;}';
 css += '.newcomment {background-color: rgba(255, 149, 40, 0.16) !important; border: 2px solid red !important;}';
 css += '.nextcomment {border: 1px solid red; color: red !important; width: 100%; text-align: center; display: block;}';
 css += 'table.comment-tree { border-collapse: collapse; }';
-
 GM_addStyle(css);
 
 let itemarray, maxpost;
 let stored, nextcommenthash, comment;
-
 
 // Use IntersectionObserver.isIntersecting to make sure we only annotate and store data we actually saw, ignore tabs opened in the background until made active. Browser crash no longer loses background tab reading progress.
 const observe = new IntersectionObserver(entries => {
