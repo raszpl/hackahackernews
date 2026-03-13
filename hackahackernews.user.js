@@ -13,12 +13,13 @@
 // @grant		GM_addStyle
 // ==/UserScript==
 
-let css = '.notseen {background-color: #dff0d8 !important;}';
-css += '.seenread {background-color: #d0a5bd !important;}';
-css += '.newcomments {color: #d00000 !important;}';
-css += '.newcomment {background-color: rgba(255, 149, 40, 0.16) !important; border: 2px solid red !important;}';
-css += '.nextcomment {border: 1px solid red; color: red !important; width: 100%; text-align: center; display: block;}';
-css += 'table.comment-tree { border-collapse: collapse; }';
+let css = '.notseen {background-color: #dff0d8;}';
+css += '.seenread {background-color: #d0a5bd;}';
+css += '.newcomments {color: #d00000;}';
+css += '.newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
+css += '.nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
+css += 'table.comment-tree {border-collapse: collapse;}'; // looks better when drawing borders around new/own posts
+css += '.subtext a:visited {color: #ab6060 !important;}'; // make visited links more visible
 GM_addStyle(css);
 
 let itemarray, maxpost;
