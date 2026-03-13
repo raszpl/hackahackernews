@@ -11,6 +11,8 @@
 // @supportURL   https://github.com/raszpl/hackahackernews/issues
 // @match        https://news.ycombinator.com/*
 // @grant		GM_addStyle
+// @grant		GM_getValue
+// @grant		GM_setValue
 // ==/UserScript==
 
 let css = '.notseen {background-color: #dff0d8;}';
@@ -18,10 +20,12 @@ css += '.seenread {background-color: #d0a5bd;}';
 css += '.newcomments {color: #d00000;}';
 css += '.newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
 css += '.nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
+css += '.hhn_mycomment {background-color: rgba(40, 255, 129, 0.16); border: 2px solid green;}';
 css += 'table.comment-tree {border-collapse: collapse;}'; // looks better when drawing borders around new/own posts
 css += '.subtext a:visited {color: #ab6060 !important;}'; // make visited links more visible
 GM_addStyle(css);
 
+const nickname = document.getElementById("me")?.textContent;
 let itemarray, maxpost;
 let stored, nextcommenthash, comment;
 
@@ -68,6 +72,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
     nextcommenthash = false;
     for (let i = itemarray.length; i >= 0; i--)
     {
+		const element = document.getElementById(itemarray[i]);
       if (itemarray[i]>maxpost)
       {
         if (nextcommenthash)
@@ -82,13 +87,17 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
             document.body.scrollTop += parseInt(document.getElementById(this.getAttribute('next-unread')).getBoundingClientRect().top) - e.clientY + 10;
             return false;
           };
-          document.getElementById(itemarray[i]).appendChild(font);
+          element.appendChild(font);
         }
 
-        document.getElementById(itemarray[i]).className +=" newcomment";
+        element.classList.add("newcomment");
         nextcommenthash = itemarray[i];
       }
-    }
+		// moderated/removed posts have no hnuser element so lets make sure this one does before comparison
+		if (nickname && element.querySelector('.hnuser')?.textContent == nickname) {
+			element.classList.add('hhn_mycomment');
+		}
+	}
     if (nextcommenthash)
     {
       window.location.hash = nextcommenthash;
