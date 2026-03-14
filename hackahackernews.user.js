@@ -171,8 +171,9 @@ function item(keys) {
 	if (nextcommenthash && (maxpost > 0)) {
 		const nextcommenthash_element = document.getElementById(nextcommenthash);
 		nextcommenthash_element.classList.remove('noshow'); // make sure nextcommenthash is visible in the first place, otherwise auto scroll wont work
-		window.location.hash = nextcommenthash;
-		document.body.scrollTop -= 400;
+		const scrollingElement = document.scrollingElement || document.documentElement;
+		// fine scroll placing first new comment right in the middle of screen
+		scrollingElement.scrollTop -= window.innerHeight/2 - nextcommenthash_element.getBoundingClientRect().top - nextcommenthash_element.getBoundingClientRect().height/2;
 	}
 	// handling manual scrollRestoration in case of #hash in URL
 	else if (location.hash) {
