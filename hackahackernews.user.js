@@ -19,7 +19,7 @@ let css = '.notseen {background-color: #dff0d8;}';
 css += '.seenread {background-color: #d0a5bd;}';
 css += '.newcomments {color: #d00000;}';
 css += '.newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
-css += '.nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
+css += '.hhn_nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
 css += '.hhn_mycomment {background-color: rgba(40, 255, 129, 0.16); border: 2px solid green;}';
 css += 'table.comment-tree {border-collapse: collapse;}'; // looks better when drawing borders around new/own posts
 css += '.subtext a:visited {color: #ab6060 !important;}'; // make visited links more visible
@@ -65,7 +65,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
     break;
 
   case "item":
-	const itemid = document.querySelectorAll('.athing:not(.comtr)')[0].id;
+	const itemid = document.querySelector('.athing:not(.comtr)').id;
     const stored = localStorage.getItem() ? localStorage.getItem(itemid) : "1 0";
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
@@ -73,7 +73,11 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 	let new_maxpost = 0;
 	nextcommenthash = false;
 
-    for (let idx = comments.length-1; idx >= 0; idx--) // we are processing from the bottom up
+	const template = document.createElement('a');
+	template.className = 'hhn_nextcomment';
+	template.textContent = 'Next';
+
+	for (let idx = comments.length-1; idx >= 0; idx--) // we are processing from the bottom up
     {
 		const commentid = Number(comments[idx].id);
 		const element = comments[idx];
@@ -83,17 +87,10 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
       {
         if (nextcommenthash)
         {
-          let font= document.createElement("a");
-          font.className = "nextcomment";
-          font.textContent = "Next";
-          font.href = location.href.replace(location.hash,"") +"#"+nextcommenthash;
-          font.setAttribute('next-unread', nextcommenthash);
-          font.onclick = function(e) {
-            document.getElementById(this.getAttribute('next-unread')).classList.remove("noshow");
-            document.body.scrollTop += parseInt(document.getElementById(this.getAttribute('next-unread')).getBoundingClientRect().top) - e.clientY + 10;
-            return false;
-          };
-          element.appendChild(font);
+			const next = template.cloneNode(true);
+			next.href = '#' + nextcommenthash;
+
+			element.appendChild(next);
         }
 
         element.classList.add("newcomment");
@@ -103,6 +100,20 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 		if (nickname && element.querySelector('.hnuser')?.textContent == nickname) {
 			element.classList.add('hhn_mycomment');
 		}
+	}
+	// create global listener if we have Next anchors
+	if (nextcommenthash) {
+		document.querySelector('table.comment-tree')?.addEventListener('click', e => {
+			if (e.target.className != 'hhn_nextcomment') return;
+
+			const target = document.getElementById(e.target.hash.slice(1));
+			target.classList.remove('noshow');
+
+			const scrollingElement = document.scrollingElement || document.documentElement;
+			scrollingElement.scrollTop += target.getBoundingClientRect().top - e.clientY + 10;
+
+			e.preventDefault();
+		});
 	}
     if (nextcommenthash)
     {
