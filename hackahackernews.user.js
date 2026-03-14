@@ -69,71 +69,9 @@ function annotate() {
 			break;
 
 		case "item":
-			history.scrollRestoration = 'manual';
-			const itemid = document.querySelector('.athing:not(.comtr)').id;
-			const stored = localStorage.getItem() ? localStorage.getItem(itemid) : "1 0";
-			const comments = document.querySelectorAll('.athing.comtr');
-			const comments_number = comments.length;
-			const maxpost = parseInt(stored.split(' ')[0]);
-			let new_maxpost = 0;
-			let nextcommenthash = false;
-
-			const template = document.createElement('a');
-			template.className = 'hhn_nextcomment';
-			template.textContent = 'Next';
-
-			for (let idx = comments.length-1; idx >= 0; idx--) {// we are processing from the bottom up
-				const commentid = Number(comments[idx].id);
-				const element = comments[idx];
-
-				if (commentid > new_maxpost) new_maxpost = commentid;
-				if (commentid > maxpost) {
-					if (nextcommenthash) {
-						const next = template.cloneNode(true);
-						next.href = '#' + nextcommenthash;
-
-						element.appendChild(next);
-					}
-
-					element.classList.add("hhn_newcomment");
-					nextcommenthash = commentid;
-				}
-				// moderated/removed posts have no hnuser element so lets make sure this one does before comparison
-				if (nickname && element.querySelector('.hnuser')?.textContent == nickname) {
-					element.classList.add('hhn_mycomment');
-				}
-			}
-			// create global listener if we have Next anchors
-			if (nextcommenthash) {
-				document.querySelector('table.comment-tree')?.addEventListener('click', e => {
-					if (e.target.className != 'hhn_nextcomment') return;
-
-					const target = document.getElementById(e.target.hash.slice(1));
-					target.classList.remove('noshow');
-
-					const scrollingElement = document.scrollingElement || document.documentElement;
-					scrollingElement.scrollTop += target.getBoundingClientRect().top - e.clientY + 10;
-
-					e.preventDefault();
-				});
-			}
-			// consider scroll only if its not the first time we open this page
-			if (nextcommenthash && (maxpost > 0)) {
-				const nextcommenthash_element = document.getElementById(nextcommenthash);
-				nextcommenthash_element.classList.remove('noshow'); // make sure nextcommenthash is visible in the first place, otherwise auto scroll wont work
-				window.location.hash = nextcommenthash;
-				document.body.scrollTop -= 400;
-			}
-			// handling manual scrollRestoration in case of #hash in URL
-			else if (location.hash) {
-				nextcommenthash = location.hash.slice(1);
-				location.hash = '';
-				location.hash = nextcommenthash;
-			}
-
-			// posts with parent element are not the main threads, dont track those
-			if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
-				localStorage.setItem(itemid, new_maxpost +" "+ comments_number);
+			{
+				const item_element = document.querySelector('.athing:not(.comtr)');
+				item([[Number(item_element.id), item_element]]);
 			}
 			break;
 
@@ -178,5 +116,73 @@ function news(itemarray) {
 				comment_num_element.append(' ', span);
 			}
 		}
+	}
+}
+
+function item(keys) {
+	history.scrollRestoration = 'manual';
+	const itemid = keys[0][0];
+	const comments = document.querySelectorAll('.athing.comtr');
+	const comments_number = comments.length;
+	const stored = localStorage.getItem() ? localStorage.getItem(itemid) : "1 0";
+	const maxpost = parseInt(stored.split(' ')[0]);
+	let new_maxpost = 0;
+	let nextcommenthash = false;
+
+	const template = document.createElement('a');
+	template.className = 'hhn_nextcomment';
+	template.textContent = 'Next';
+
+	for (let idx = comments.length-1; idx >= 0; idx--) { // we are processing from the bottom up
+		const commentid = Number(comments[idx].id);
+		const element = comments[idx];
+
+		if (commentid > new_maxpost) new_maxpost = commentid;
+		if (commentid > maxpost) {
+			if (nextcommenthash) {
+				const next = template.cloneNode(true);
+				next.href = '#' + nextcommenthash;
+
+				element.appendChild(next);
+			}
+			element.classList.add('hhn_newcomment');
+			nextcommenthash = commentid;
+		}
+		// moderated/removed posts have no hnuser element so lets make sure this one does before comparison
+		if (nickname && element.querySelector('.hnuser')?.textContent == nickname) {
+			element.classList.add('hhn_mycomment');
+		}
+	}
+	// create global listener if we have Next anchors
+	if (nextcommenthash) {
+		document.querySelector('table.comment-tree')?.addEventListener('click', e => {
+			if (e.target.className != 'hhn_nextcomment') return;
+
+			const target = document.getElementById(e.target.hash.slice(1));
+			target.classList.remove('noshow');
+
+			const scrollingElement = document.scrollingElement || document.documentElement;
+			scrollingElement.scrollTop += target.getBoundingClientRect().top - e.clientY + 10;
+
+			e.preventDefault();
+		});
+	}
+	// consider scroll only if its not the first time we open this page
+	if (nextcommenthash && (maxpost > 0)) {
+		const nextcommenthash_element = document.getElementById(nextcommenthash);
+		nextcommenthash_element.classList.remove('noshow'); // make sure nextcommenthash is visible in the first place, otherwise auto scroll wont work
+		window.location.hash = nextcommenthash;
+		document.body.scrollTop -= 400;
+	}
+	// handling manual scrollRestoration in case of #hash in URL
+	else if (location.hash) {
+		nextcommenthash = location.hash.slice(1);
+		location.hash = '';
+		location.hash = nextcommenthash;
+	}
+
+	// posts with parent element are not the main threads, dont track those
+	if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
+		localStorage.setItem(itemid, new_maxpost +" "+ comments_number);
 	}
 }
