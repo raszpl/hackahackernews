@@ -3,7 +3,7 @@
 // @description	Comment system enthancement. Highlights new comments/stories, marks stories you visited, adds "jump to new comment" links. localStorage stores IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL	https://github.com/raszpl/hackahackernews
 // @author		Rasz_pl (citizenr@gmail.com)
-// @version		0.6.1
+// @version		0.7
 // @namespace	https://github.com/raszpl/hackahackernews
 // @license		GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 // @updateURL	https://github.com/raszpl/hackahackernews
