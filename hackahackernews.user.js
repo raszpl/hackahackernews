@@ -115,9 +115,13 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 			e.preventDefault();
 		});
 	}
-    if (nextcommenthash)
+	// consider scroll only if its not the first time we open this page
+	if (nextcommenthash && (maxpost > 0))
     {
-      window.location.hash = nextcommenthash;
+      history.scrollRestoration = 'manual';
+	  const nextcommenthash_element = document.getElementById(nextcommenthash);
+	  nextcommenthash_element.classList.remove('noshow'); // make sure nextcommenthash is visible in the first place, otherwise auto scroll wont work
+	  window.location.hash = nextcommenthash;
       document.body.scrollTop -= 400;
     }
 
