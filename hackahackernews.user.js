@@ -65,6 +65,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
     break;
 
   case "item":
+	history.scrollRestoration = 'manual';
 	const itemid = document.querySelector('.athing:not(.comtr)').id;
     const stored = localStorage.getItem() ? localStorage.getItem(itemid) : "1 0";
 	const comments = document.querySelectorAll('.athing.comtr');
@@ -118,12 +119,17 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 	// consider scroll only if its not the first time we open this page
 	if (nextcommenthash && (maxpost > 0))
     {
-      history.scrollRestoration = 'manual';
 	  const nextcommenthash_element = document.getElementById(nextcommenthash);
 	  nextcommenthash_element.classList.remove('noshow'); // make sure nextcommenthash is visible in the first place, otherwise auto scroll wont work
 	  window.location.hash = nextcommenthash;
       document.body.scrollTop -= 400;
     }
+	// handling manual scrollRestoration in case of #hash in URL
+	else if (location.hash) {
+		nextcommenthash = location.hash.slice(1);
+		location.hash = '';
+		location.hash = nextcommenthash;
+	}
 
 	// posts with parent element are not the main threads, dont track those
 	if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
