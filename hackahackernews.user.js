@@ -15,7 +15,10 @@
 // @grant		GM_setValue
 // ==/UserScript==
 
-let css = '.hhn_notseen {background-color: #dff0d8;}';
+let css = '#hnmain:not(.hhn_show_all) .hhn_invisible {display: none;}';
+css += '.hhn_btn {color: inherit; background-color: transparent; border: 0; padding: 0; outline:0; font-family: inherit;}';
+css += '.hhn_btnpressed {color: white !important;}';
+css += '.hhn_notseen {background-color: #dff0d8;}';
 css += '.hhn_seenread {background-color: #d0a5bd;}';
 css += '.hhn_newcomments {color: #d00000; font-weight: bolder;}';
 css += '.hhn_newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
@@ -41,6 +44,26 @@ observe.observe(document.getElementById("hnmain"));
 function annotate() {
 	switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
 		case "news":
+			{ // "show all" button disables filtering
+				const button = document.createElement("button");
+				button.textContent = "show all";
+				button.className = "hhn_btn";
+				button.checked = GM_getValue("showall", false);
+				if (button.checked) {
+					document.getElementById("hnmain").classList.toggle('hhn_show_all', button.checked);
+					button.classList.add("hhn_btnpressed");
+				}
+				const pagetop = document.querySelector(".pagetop");
+				pagetop.appendChild(document.createTextNode(" | "));
+				pagetop.appendChild(button);
+				button.addEventListener("click", function() {
+					this.checked = !this.checked; // Smack it up, flip it, rub it down
+					document.getElementById("hnmain").classList.toggle('hhn_show_all', this.checked);
+					button.classList.toggle('hhn_btnpressed', this.checked);
+					GM_setValue("showall", this.checked);
+				});
+			}
+
 			// prepare a list of all articles, query their status in our database
 			news(Array.from(document.querySelectorAll('.athing:not(.comtr)'), x => [Number(x.id), x]));
 			break;
