@@ -15,7 +15,7 @@
 // @grant		GM_setValue
 // ==/UserScript==
 
-let css = '.notseen {background-color: #dff0d8;}';
+let css = '.hhn_notseen {background-color: #dff0d8;}';
 css += '.hhn_seenread {background-color: #d0a5bd;}';
 css += '.newcomments {color: #d00000;}';
 css += '.hhn_newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
@@ -26,7 +26,7 @@ css += '.subtext a:visited {color: #ab6060 !important;}'; // make visited links 
 GM_addStyle(css);
 
 const nickname = document.getElementById("me")?.textContent;
-let itemarray, maxpost;
+let maxpost;
 
 // Use IntersectionObserver.isIntersecting to make sure we only annotate and store data we actually saw, ignore tabs opened in the background until made active. Browser crash no longer loses background tab reading progress.
 const observe = new IntersectionObserver(entries => {
@@ -42,23 +42,32 @@ observe.observe(document.getElementById("hnmain"));
 function annotate() {
 	switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
 		case "news":
-			itemarray = Array.prototype.map.call(document.querySelectorAll('.athing:not(.comtr)'), function(x) { return x.id; });
+			{
+			const itemarray = Array.from(document.querySelectorAll('.athing:not(.comtr)'), x => [Number(x.id), x]);
 			for (let i = 0; i < itemarray.length; i++) {
-				if (!localStorage.getItem(itemarray[i])) {
-					document.getElementById(itemarray[i]).className +=" notseen";
-					localStorage.setItem(itemarray[i], 1);
+				const item_id = itemarray[i][0];
+				const item_element = itemarray[i][1];
+				const gotItem = localStorage.getItem(itemarray[i]);
+
+				if (!gotItem) {
+					localStorage.setItem(item_id, 1);
+					item_element.classList.add("hhn_notseen");
 				}
-				else if (parseInt(localStorage.getItem(itemarray[i]).split(' ')[0])>1) {
-					document.getElementById(itemarray[i]).classList.add("hhn_seenread");
-					const comment_num_element = document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]');
+				else if (parseInt(gotItem.split(' ')[0])>1) {
+					item_element.classList.add("hhn_seenread");
+					const comment_num_element = item_element.nextElementSibling.querySelector('span.subline > a[href^="item?id='+item_id+'"]');
 					if (!comment_num_element) break;
 					const comment_num = parseInt(comment_num_element.textContent);
 					if (!comment_num) break;
-					if (comment_num > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1])) {
-						const fresh = comment_num - parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]);
-						comment_num_element.innerHTML += ' <span class="newcomments">'+fresh+' new</span>';
+					if (comment_num > parseInt(gotItem.split(' ')[1])) {
+						const span = document.createElement('span');
+						span.className = 'hhn_newcomments';
+						span.textContent = (comment_num - parseInt(gotItem.split(' ')[1])) + ' new';
+
+						comment_num_element.append(' ', span);
 					}
 				}
+			}
 			}
 			break;
 
