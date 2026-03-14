@@ -16,9 +16,9 @@
 // ==/UserScript==
 
 let css = '.notseen {background-color: #dff0d8;}';
-css += '.seenread {background-color: #d0a5bd;}';
+css += '.hhn_seenread {background-color: #d0a5bd;}';
 css += '.newcomments {color: #d00000;}';
-css += '.newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
+css += '.hhn_newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
 css += '.hhn_nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
 css += '.hhn_mycomment {background-color: rgba(40, 255, 129, 0.16); border: 2px solid green;}';
 css += 'table.comment-tree {border-collapse: collapse;}'; // looks better when drawing borders around new/own posts
@@ -53,11 +53,15 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
       }
       else if (parseInt(localStorage.getItem(itemarray[i]).split(' ')[0])>1)
       {
-        document.getElementById(itemarray[i]).className +=" seenread";
-        if (parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]))
+		document.getElementById(itemarray[i]).classList.add("hhn_seenread");
+		const comment_num_element = document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]');
+		if (!comment_num_element) break;
+		const comment_num = parseInt(comment_num_element.textContent);
+		if (!comment_num) break;
+		if (comment_num > parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]))
         {
-          let fresh = parseInt(document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerText) - parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]);
-          document.querySelector('.subtext > span.subline > a[href^="item?id='+itemarray[i]+'"]').innerHTML += ' <a class="newcomments"><b>'+fresh+' new</b></a>';
+			const fresh = comment_num - parseInt(localStorage.getItem(itemarray[i]).split(' ')[1]);
+			comment_num_element.innerHTML += ' <span class="newcomments">'+fresh+' new</span>';
         }
       }
     }
@@ -93,7 +97,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 			element.appendChild(next);
         }
 
-        element.classList.add("newcomment");
+        element.classList.add("hhn_newcomment");
         nextcommenthash = commentid;
       }
 		// moderated/removed posts have no hnuser element so lets make sure this one does before comparison
@@ -143,7 +147,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
     {
       if (itemarray[i]>maxpost)
       {
-        document.getElementById(itemarray[i]).className +=" newcomment";
+        document.getElementById(itemarray[i]).classList.add("hhn_newcomment");
       }
     }
     maxpost = (maxpost > Math.max.apply(Math,itemarray.concat([1]))) ? maxpost : Math.max.apply(Math,itemarray.concat([1]));
