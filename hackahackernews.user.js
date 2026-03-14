@@ -17,7 +17,7 @@
 
 let css = '.hhn_notseen {background-color: #dff0d8;}';
 css += '.hhn_seenread {background-color: #d0a5bd;}';
-css += '.newcomments {color: #d00000;}';
+css += '.hhn_newcomments {color: #d00000;}';
 css += '.hhn_newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
 css += '.hhn_nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
 css += '.hhn_mycomment {background-color: rgba(40, 255, 129, 0.16); border: 2px solid green;}';
