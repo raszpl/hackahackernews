@@ -65,15 +65,21 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
     break;
 
   case "item":
-    stored = localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) ? localStorage.getItem(document.querySelectorAll('.athing:not(.comtr)')[0].id) : "1 0";
-    maxpost = parseInt(stored.split(' ')[0]);
-    itemarray = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; });
+	const itemid = document.querySelectorAll('.athing:not(.comtr)')[0].id;
+    const stored = localStorage.getItem() ? localStorage.getItem(itemid) : "1 0";
+	const comments = document.querySelectorAll('.athing.comtr');
+	const comments_number = comments.length;
+	const maxpost = parseInt(stored.split(' ')[0]);
+	let new_maxpost = 0;
+	nextcommenthash = false;
 
-    nextcommenthash = false;
-    for (let i = itemarray.length; i >= 0; i--)
+    for (let idx = comments.length-1; idx >= 0; idx--) // we are processing from the bottom up
     {
-		const element = document.getElementById(itemarray[i]);
-      if (itemarray[i]>maxpost)
+		const commentid = Number(comments[idx].id);
+		const element = comments[idx];
+
+		if (commentid > new_maxpost) new_maxpost = commentid;
+		if (commentid > maxpost)
       {
         if (nextcommenthash)
         {
@@ -91,7 +97,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
         }
 
         element.classList.add("newcomment");
-        nextcommenthash = itemarray[i];
+        nextcommenthash = commentid;
       }
 		// moderated/removed posts have no hnuser element so lets make sure this one does before comparison
 		if (nickname && element.querySelector('.hnuser')?.textContent == nickname) {
@@ -103,9 +109,8 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
       window.location.hash = nextcommenthash;
       document.body.scrollTop -= 400;
     }
-    maxpost = Math.max.apply(Math,itemarray.concat([1]));
-    comment = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; }).length;
-    localStorage.setItem(document.querySelectorAll('.athing:not(.comtr)')[0].id, maxpost +" "+comment);
+
+    localStorage.setItem(itemid, new_maxpost +" "+ comments_number);
     break;
 
   case "threads":
