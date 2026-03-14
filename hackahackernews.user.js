@@ -125,7 +125,10 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
       document.body.scrollTop -= 400;
     }
 
-    localStorage.setItem(itemid, new_maxpost +" "+ comments_number);
+	// posts with parent element are not the main threads, dont track those
+	if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
+		localStorage.setItem(itemid, new_maxpost +" "+ comments_number);
+	}
     break;
 
   case "threads":
