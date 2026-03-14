@@ -17,7 +17,7 @@
 
 let css = '.hhn_notseen {background-color: #dff0d8;}';
 css += '.hhn_seenread {background-color: #d0a5bd;}';
-css += '.hhn_newcomments {color: #d00000;}';
+css += '.hhn_newcomments {color: #d00000; font-weight: bolder;}';
 css += '.hhn_newcomment {background-color: rgba(255, 149, 40, 0.16); border: 2px solid red;}';
 css += '.hhn_nextcomment {border: 1px solid red; color: red; width: 100%; text-align: center; display: block;}';
 css += '.hhn_mycomment {background-color: rgba(40, 255, 129, 0.16); border: 2px solid green;}';
@@ -26,7 +26,6 @@ css += '.subtext a:visited {color: #ab6060 !important;}'; // make visited links 
 GM_addStyle(css);
 
 const nickname = document.getElementById("me")?.textContent;
-let maxpost;
 
 // Use IntersectionObserver.isIntersecting to make sure we only annotate and store data we actually saw, ignore tabs opened in the background until made active. Browser crash no longer loses background tab reading progress.
 const observe = new IntersectionObserver(entries => {
@@ -42,33 +41,8 @@ observe.observe(document.getElementById("hnmain"));
 function annotate() {
 	switch(document.getElementsByTagName('html')[0].getAttribute('op')) {
 		case "news":
-			{
-			const itemarray = Array.from(document.querySelectorAll('.athing:not(.comtr)'), x => [Number(x.id), x]);
-			for (let i = 0; i < itemarray.length; i++) {
-				const item_id = itemarray[i][0];
-				const item_element = itemarray[i][1];
-				const gotItem = localStorage.getItem(itemarray[i]);
-
-				if (!gotItem) {
-					localStorage.setItem(item_id, 1);
-					item_element.classList.add("hhn_notseen");
-				}
-				else if (parseInt(gotItem.split(' ')[0])>1) {
-					item_element.classList.add("hhn_seenread");
-					const comment_num_element = item_element.nextElementSibling.querySelector('span.subline > a[href^="item?id='+item_id+'"]');
-					if (!comment_num_element) break;
-					const comment_num = parseInt(comment_num_element.textContent);
-					if (!comment_num) break;
-					if (comment_num > parseInt(gotItem.split(' ')[1])) {
-						const span = document.createElement('span');
-						span.className = 'hhn_newcomments';
-						span.textContent = (comment_num - parseInt(gotItem.split(' ')[1])) + ' new';
-
-						comment_num_element.append(' ', span);
-					}
-				}
-			}
-			}
+			// prepare a list of all articles, query their status in our database
+			news(Array.from(document.querySelectorAll('.athing:not(.comtr)'), x => [Number(x.id), x]));
 			break;
 
 		case "item":
@@ -141,8 +115,8 @@ function annotate() {
 			break;
 
 		case "threads":
-			maxpost = parseInt(localStorage.getItem("mine"));
-			itemarray = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; });
+			const maxpost = parseInt(localStorage.getItem("mine"));
+			const itemarray = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; });
 			for (let i = 0; i < itemarray.length; i++) {
 				if (itemarray[i]>maxpost) {
 					document.getElementById(itemarray[i]).classList.add("hhn_newcomment");
@@ -154,5 +128,32 @@ function annotate() {
 
 		case "reply":
 			break;
+	}
+}
+
+function news(itemarray) {
+	for (let i = 0; i < itemarray.length; i++) {
+		const item_id = itemarray[i][0];
+		const item_element = itemarray[i][1];
+		const gotItem = localStorage.getItem(itemarray[i]);
+
+		if (!gotItem) {
+			localStorage.setItem(item_id, 1);
+			item_element.classList.add("hhn_notseen");
+		}
+		else if (parseInt(gotItem.split(' ')[0])>1) {
+			item_element.classList.add("hhn_seenread");
+			const comment_num_element = item_element.nextElementSibling.querySelector('span.subline > a[href^="item?id='+item_id+'"]');
+			if (!comment_num_element) break;
+			const comment_num = parseInt(comment_num_element.textContent);
+			if (!comment_num) break;
+			if (comment_num > parseInt(gotItem.split(' ')[1])) {
+				const span = document.createElement('span');
+				span.className = 'hhn_newcomments';
+				span.textContent = (comment_num - parseInt(gotItem.split(' ')[1])) + ' new';
+
+				comment_num_element.append(' ', span);
+			}
+		}
 	}
 }
