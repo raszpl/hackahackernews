@@ -76,15 +76,20 @@ function annotate() {
 			break;
 
 		case "threads":
-			const maxpost = parseInt(localStorage.getItem("mine"));
-			const itemarray = Array.prototype.map.call(document.getElementsByClassName("athing comtr"), function(x) { return x.id; });
-			for (let i = 0; i < itemarray.length; i++) {
-				if (itemarray[i]>maxpost) {
-					document.getElementById(itemarray[i]).classList.add("hhn_newcomment");
+			{
+				const maxpost = parseInt(GM_getValue("mine", 0));
+				let new_maxpost = 0;
+				const itemarray = Array.from(document.querySelectorAll('.athing.comtr'), x => Number(x.id));
+				for (const commentid of itemarray) {
+					if (commentid > new_maxpost) new_maxpost = commentid;
+					if (commentid > maxpost) {
+						document.getElementById(commentid).classList.add("hhn_newcomment");
+					}
+				}
+				if (new_maxpost > maxpost) {
+					GM_setValue("mine", new_maxpost);
 				}
 			}
-			maxpost = (maxpost > Math.max.apply(Math,itemarray.concat([1]))) ? maxpost : Math.max.apply(Math,itemarray.concat([1]));
-			localStorage.setItem("mine", maxpost);
 			break;
 
 		case "reply":
