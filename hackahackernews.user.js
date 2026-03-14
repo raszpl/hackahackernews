@@ -27,7 +27,6 @@ GM_addStyle(css);
 
 const nickname = document.getElementById("me")?.textContent;
 let itemarray, maxpost;
-let stored, nextcommenthash, comment;
 
 // Use IntersectionObserver.isIntersecting to make sure we only annotate and store data we actually saw, ignore tabs opened in the background until made active. Browser crash no longer loses background tab reading progress.
 const observe = new IntersectionObserver(entries => {
@@ -72,7 +71,7 @@ switch(document.getElementsByTagName('html')[0].getAttribute('op'))
 	const comments_number = comments.length;
 	const maxpost = parseInt(stored.split(' ')[0]);
 	let new_maxpost = 0;
-	nextcommenthash = false;
+	let nextcommenthash = false;
 
 	const template = document.createElement('a');
 	template.className = 'hhn_nextcomment';
