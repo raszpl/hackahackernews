@@ -135,7 +135,7 @@ function item(keys) {
 	const item_id = keys[0][0];
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
-	const stored = localStorage.getItem() ? localStorage.getItem(item_id) : "1 0";
+	const stored = localStorage.getItem(item_id) ? localStorage.getItem(item_id) : "1 0";
 	const maxpost = parseInt(stored.split(' ')[0]);
 	let new_maxpost = 0;
 	let nextcommenthash = false;
