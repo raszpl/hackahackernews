@@ -126,10 +126,10 @@ function news(itemarray) {
 
 function item(keys) {
 	history.scrollRestoration = 'manual';
-	const itemid = keys[0][0];
+	const item_id = keys[0][0];
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
-	const stored = localStorage.getItem() ? localStorage.getItem(itemid) : "1 0";
+	const stored = localStorage.getItem() ? localStorage.getItem(item_id) : "1 0";
 	const maxpost = parseInt(stored.split(' ')[0]);
 	let new_maxpost = 0;
 	let nextcommenthash = false;
@@ -189,6 +189,6 @@ function item(keys) {
 
 	// posts with parent element are not the main threads, dont track those
 	if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
-		localStorage.setItem(itemid, new_maxpost +" "+ comments_number);
+		localStorage.setItem(item_id, new_maxpost +" "+ comments_number);
 	}
 }
