@@ -15,6 +15,12 @@
 // @grant		GM_setValue
 // ==/UserScript==
 
+// localStorage format. Key is item ID, value is:
+//	"0 0" - "interacted", entered empty comments section
+//	"maxpost comments" - "interacted", entered populated comments section, saved state
+//		maxpost = timestamp of newest comment seen
+//		comments = number of comments seen
+
 let css = '#hnmain:not(.hhn_show_all) .hhn_invisible {display: none;}';
 css += '.hhn_btn {color: inherit; background-color: transparent; border: 0; padding: 0; outline:0; font-family: inherit;}';
 css += '.hhn_btnpressed {color: white !important;}';
