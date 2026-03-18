@@ -16,7 +16,8 @@
 // ==/UserScript==
 
 // localStorage format. Key is item ID, value is:
-//	"0 0" - "interacted", entered empty comments section
+//	"1" - "seen" it, didnt click
+//	"3" - "interacted", entered empty comments section
 //	"maxpost comments" - "interacted", entered populated comments section, saved state
 //		maxpost = timestamp of newest comment seen
 //		comments = number of comments seen
@@ -142,6 +143,14 @@ function item(keys) {
 	const maxpost = getItem(item_id).maxpost;
 	let new_maxpost = 0;
 	let nextcommenthash = false;
+
+	if (!comments_number) { // no comments, can end early
+		// save only main item threads, skip saving individual comments
+		if (document.querySelector('.fatitem .score')) {
+			setItem(item_id, 3);
+		}
+		return;
+	}
 
 	const template = document.createElement('a');
 	template.className = 'hhn_nextcomment';
