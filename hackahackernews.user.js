@@ -107,7 +107,7 @@ function news(itemarray) {
 	for (let i = 0; i < itemarray.length; i++) {
 		const item_id = itemarray[i][0];
 		const item_element = itemarray[i][1];
-		const gotItem = localStorage.getItem(itemarray[i]);
+		const gotItem = getItem(itemarray[i]);
 
 		if (!gotItem) {
 			setItem(item_id, 1);
@@ -135,7 +135,7 @@ function item(keys) {
 	const item_id = keys[0][0];
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
-	const stored = localStorage.getItem(item_id) ? localStorage.getItem(item_id) : "1 0";
+	const stored = getItem(item_id) ? getItem(item_id) : "1 0";
 	const maxpost = parseInt(stored.split(' ')[0]);
 	let new_maxpost = 0;
 	let nextcommenthash = false;
@@ -212,4 +212,8 @@ function setItem(key, value){
 			alert("Error: Saving to local storage.");
 		}
 	}
+}
+
+function getItem(key){
+	return localStorage.getItem(key);
 }
