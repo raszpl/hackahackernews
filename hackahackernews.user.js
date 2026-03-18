@@ -108,7 +108,7 @@ function news(itemarray) {
 	for (let i = 0; i < itemarray.length; i++) {
 		const item_id = itemarray[i][0];
 		const item_element = itemarray[i][1];
-		const gotItem = getItem(itemarray[i]);
+		const gotItem = getItem(item_id);
 
 		switch(gotItem.status) {
 			case "new":
