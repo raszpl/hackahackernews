@@ -109,23 +109,27 @@ function news(itemarray) {
 		const item_element = itemarray[i][1];
 		const gotItem = getItem(itemarray[i]);
 
-		if (!gotItem) {
-			setItem(item_id, 1);
-			item_element.classList.add("hhn_notseen");
-		}
-		else if (parseInt(gotItem.split(' ')[0])>1) {
-			item_element.classList.add("hhn_seenread");
-			const comment_num_element = item_element.nextElementSibling.querySelector('span.subline > a[href^="item?id='+item_id+'"]');
-			if (!comment_num_element) break;
-			const comment_num = parseInt(comment_num_element.textContent);
-			if (!comment_num) break;
-			if (comment_num > parseInt(gotItem.split(' ')[1])) {
-				const span = document.createElement('span');
-				span.className = 'hhn_newcomments';
-				span.textContent = (comment_num - parseInt(gotItem.split(' ')[1])) + ' new';
+		switch(gotItem.status) {
+			case "new":
+				setItem(item_id, 1);
+				item_element.classList.add("hhn_notseen");
+				break;
+			case "interacted":
+				item_element.classList.add("hhn_seenread");
+				{
+					const comment_num_element = item_element.nextElementSibling.querySelector('span.subline > a[href^="item?id='+item_id+'"]');
+					if (!comment_num_element) break;
+					const comment_num = parseInt(comment_num_element.textContent);
+					if (!comment_num) break;
+					if (comment_num > gotItem.comments) {
+						const span = document.createElement('span');
+						span.className = 'hhn_newcomments';
+						span.textContent = (comment_num - gotItem.comments) + ' new';
 
-				comment_num_element.append(' ', span);
-			}
+						comment_num_element.append(' ', span);
+					}
+				}
+				break;
 		}
 	}
 }
@@ -135,8 +139,7 @@ function item(keys) {
 	const item_id = keys[0][0];
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
-	const stored = getItem(item_id) ? getItem(item_id) : "1 0";
-	const maxpost = parseInt(stored.split(' ')[0]);
+	const maxpost = getItem(item_id).maxpost;
 	let new_maxpost = 0;
 	let nextcommenthash = false;
 
@@ -215,5 +218,35 @@ function setItem(key, value){
 }
 
 function getItem(key){
-	return localStorage.getItem(key);
+	try {
+		const gotitem = localStorage.getItem(key);
+		const splititem = gotitem?.split(' ');
+		if (!gotitem) {
+			return {status:"new", maxpost: 0, comments: 0};
+		}
+		else if (splititem.length >= 2) {
+			return {status:"interacted", maxpost: parseInt(splititem[0]), comments: parseInt(splititem[1])};
+		}
+		else {
+			switch(gotitem) {
+				case "1":
+					return {status:"seen", maxpost: 0, comments: 0};
+					break;
+				case "2":
+					return {status:"clicked", maxpost: 0, comments: 0};
+					break;
+				case "3":
+					return {status:"interacted", maxpost: 0, comments: 0};
+					break;
+				default:
+					alert("getItem: You should never see this message. Something wrong with localStorage key:" + gotitem);
+					// dummy empty value
+					return {status:"interacted", maxpost: 0, comments: 0};
+			}
+		}
+	}
+	catch (e) {
+		alert("Error: Accessing local storage.");
+		return null;
+	}
 }
