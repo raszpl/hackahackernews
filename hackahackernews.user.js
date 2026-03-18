@@ -110,7 +110,7 @@ function news(itemarray) {
 		const gotItem = localStorage.getItem(itemarray[i]);
 
 		if (!gotItem) {
-			localStorage.setItem(item_id, 1);
+			setItem(item_id, 1);
 			item_element.classList.add("hhn_notseen");
 		}
 		else if (parseInt(gotItem.split(' ')[0])>1) {
@@ -195,6 +195,21 @@ function item(keys) {
 
 	// posts with parent element are not the main threads, dont track those
 	if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
-		localStorage.setItem(item_id, new_maxpost +" "+ comments_number);
+		setItem(item_id, new_maxpost +" "+ comments_number);
+	}
+}
+
+function setItem(key, value){
+	if (localStorage.getItem(key) == value) return;
+	try {
+		localStorage.setItem(key, value);
+	}
+	catch (e) {
+		if (e.name.toLowerCase().includes("quota")) {
+			alert("Error: Local Storage size limit exceeded.");
+		}
+		else {
+			alert("Error: Saving to local storage.");
+		}
 	}
 }
