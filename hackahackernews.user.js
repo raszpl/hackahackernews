@@ -231,6 +231,12 @@ function setItem(key, value){
 }
 
 function getItem(key){
+	//	Return object format: [{status:"_", maxpost: _, comments: _}]
+	//	Return object status definition:
+	//		"new"
+	//		"seen"			// [1], only saw in once and never interacted with it, probably dont want to see it again. Those get pruned first when we run out of localStorage quota.
+	//		"interacted"	// [3] or [31547884 48], seen and opened comments
+
 	try {
 		const gotitem = localStorage.getItem(key);
 		const splititem = gotitem?.split(' ');
