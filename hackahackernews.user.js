@@ -115,7 +115,12 @@ function news(itemarray) {
 				setItem(item_id, 1);
 				item_element.classList.add("hhn_notseen");
 				break;
-			case "interacted":
+			case "seen": // only saw once and never interacted with it, we probably dont want to see it again
+				item_element.classList.add("hhn_invisible");
+				item_element.nextElementSibling.classList.add("hhn_invisible");
+				item_element.nextElementSibling.nextElementSibling.classList.add("hhn_invisible");
+				break;
+			case "interacted": // seen and opened comments
 				item_element.classList.add("hhn_seenread");
 				{
 					const comment_num_element = item_element.nextElementSibling.querySelector('span.subline > a[href^="item?id='+item_id+'"]');
