@@ -78,7 +78,7 @@ function annotate() {
 		case "item":
 			{
 				const item_element = document.querySelector('.athing:not(.comtr)');
-				item([[Number(item_element.id), item_element]]);
+				item(Number(item_element.id));
 			}
 			break;
 
@@ -140,9 +140,8 @@ function news(itemarray) {
 	}
 }
 
-function item(keys) {
+function item(item_id) {
 	history.scrollRestoration = 'manual';
-	const item_id = keys[0][0];
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
 	const maxpost = getItem(item_id).maxpost;
