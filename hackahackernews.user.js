@@ -71,7 +71,6 @@ function annotate() {
 				});
 			}
 
-			// prepare a list of all articles, query their status in our database
 			news(document.querySelectorAll('.athing:not(.comtr)'));
 			break;
 
@@ -141,7 +140,8 @@ function item(item_id) {
 	history.scrollRestoration = 'manual';
 	const comments = document.querySelectorAll('.athing.comtr');
 	const comments_number = comments.length;
-	const maxpost = getItem(item_id).maxpost;
+	const gotItem = getItem(item_id);
+	const maxpost = gotItem.maxpost;
 	let new_maxpost = 0;
 	let nextcommenthash = false;
 
