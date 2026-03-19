@@ -3,7 +3,7 @@
 // @description	Comment system enthancement. Highlights new comments/stories, marks stories you visited, adds "jump to new comment" links. localStorage stores IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL	https://github.com/raszpl/hackahackernews
 // @author		Rasz_pl (citizenr@gmail.com)
-// @version		0.7
+// @version		0.8
 // @namespace	https://github.com/raszpl/hackahackernews
 // @license		GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 // @updateURL	https://github.com/raszpl/hackahackernews
@@ -17,6 +17,7 @@
 
 // localStorage format. Key is item ID, value is:
 //	"1" - "seen" it, didnt click
+//	"2" - "clicked" on link, didnt enter comments section
 //	"3" - "interacted", entered empty comments section
 //	"maxpost comments" - "interacted", entered populated comments section, saved state
 //		maxpost = timestamp of newest comment seen
@@ -116,6 +117,9 @@ function news(nodelist) {
 				item_element.nextElementSibling.classList.add("hhn_invisible");
 				item_element.nextElementSibling.nextElementSibling.classList.add("hhn_invisible");
 				break;
+			case "clicked": // clicked on a story link
+				item_element.classList.add("hhn_seenread");
+				break;
 			case "interacted": // seen and opened comments
 				item_element.classList.add("hhn_seenread");
 				{
@@ -134,6 +138,7 @@ function news(nodelist) {
 				break;
 		}
 	}
+	interestListeners();
 }
 
 function item(item_id) {
@@ -233,6 +238,7 @@ function getItem(key){
 	//	Return object status definition:
 	//		"new"
 	//		"seen"			// [1], only saw in once and never interacted with it, probably dont want to see it again. Those get pruned first when we run out of localStorage quota.
+	//		"clicked"		// [2], clicked on a story link
 	//		"interacted"	// [3] or [31547884 48], seen and opened comments
 
 	try {
@@ -266,4 +272,22 @@ function getItem(key){
 		alert("Error: Accessing local storage.");
 		return null;
 	}
+}
+
+function interestListeners() {
+	function storyClick(e) {
+		// new story links get listener to track interest
+		if (!e.target.closest('.hhn_notseen')) return;
+		// Click/middle click on title
+		if (((e.button == 0 || e.button == 1) && e.target.closest('.titleline'))
+			// click on uparrow
+			|| (e.button == 0 && (e.target.classList.contains('votearrow') || e.target.querySelector('votearrow'))) ) {
+			const target = e.target.closest('.athing').id;
+			if (target && ['1', null].includes(localStorage.getItem(target))) {
+				setItem(target, 2);
+			}
+		}
+	}
+	document.addEventListener("click", storyClick, true);
+	document.addEventListener('auxclick', storyClick, true);
 }
