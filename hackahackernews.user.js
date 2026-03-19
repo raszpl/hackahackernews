@@ -3,7 +3,7 @@
 // @description	Comment system enthancement. Highlights new comments/stories, marks stories you visited, adds "jump to new comment" links. localStorage stores IDs of seen/visited stories with corresponding timestamp/number of comments last seen.
 // @homepageURL	https://github.com/raszpl/hackahackernews
 // @author		Rasz_pl (citizenr@gmail.com)
-// @version		0.8
+// @version		0.9
 // @namespace	https://github.com/raszpl/hackahackernews
 // @license		GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 // @updateURL	https://github.com/raszpl/hackahackernews
@@ -19,9 +19,10 @@
 //	"1" - "seen" it, didnt click
 //	"2" - "clicked" on link, didnt enter comments section
 //	"3" - "interacted", entered empty comments section
-//	"maxpost comments" - "interacted", entered populated comments section, saved state
+//	"maxpost comments popularity" - "interacted", entered populated comments section, saved state
 //		maxpost = timestamp of newest comment seen
 //		comments = number of comments seen
+//		popularity = how many times comments section was visited
 
 let css = '#hnmain:not(.hhn_show_all) .hhn_invisible {display: none;}';
 css += '.hhn_btn {color: inherit; background-color: transparent; border: 0; padding: 0; outline:0; font-family: inherit;}';
@@ -147,6 +148,7 @@ function item(item_id) {
 	const comments_number = comments.length;
 	const gotItem = getItem(item_id);
 	const maxpost = gotItem.maxpost;
+	const popularity = gotItem.popularity;
 	let new_maxpost = 0;
 	let nextcommenthash = false;
 
@@ -213,7 +215,7 @@ function item(item_id) {
 
 	// posts with parent element are not the main threads, dont track those
 	if (!document.querySelector('.athing:not(.comtr) .par') && document.querySelector('.fatitem .score')) {
-		setItem(item_id, new_maxpost +" "+ comments_number);
+		setItem(item_id, new_maxpost +" "+ comments_number +" "+ (popularity + 1));
 	}
 }
 
@@ -234,37 +236,37 @@ function setItem(key, value){
 }
 
 function getItem(key){
-	//	Return object format: [{status:"_", maxpost: _, comments: _}]
+	//	Return object format: [{status:"_", maxpost: _, comments: _, popularity: _}]
 	//	Return object status definition:
 	//		"new"
 	//		"seen"			// [1], only saw in once and never interacted with it, probably dont want to see it again. Those get pruned first when we run out of localStorage quota.
 	//		"clicked"		// [2], clicked on a story link
-	//		"interacted"	// [3] or [31547884 48], seen and opened comments
+	//		"interacted"	// [3] or [31547884 48 1], seen and opened comments
 
 	try {
 		const gotitem = localStorage.getItem(key);
 		const splititem = gotitem?.split(' ');
 		if (!gotitem) {
-			return {status:"new", maxpost: 0, comments: 0};
+			return {status:"new", maxpost: 0, comments: 0, popularity: 0};
 		}
 		else if (splititem.length >= 2) {
-			return {status:"interacted", maxpost: parseInt(splititem[0]), comments: parseInt(splititem[1])};
+			return {status:"interacted", maxpost: parseInt(splititem[0]), comments: parseInt(splititem[1]), popularity: splititem[2] ? parseInt(splititem[2]) : 0};
 		}
 		else {
 			switch(gotitem) {
 				case "1":
-					return {status:"seen", maxpost: 0, comments: 0};
+					return {status:"seen", maxpost: 0, comments: 0, popularity: 0};
 					break;
 				case "2":
-					return {status:"clicked", maxpost: 0, comments: 0};
+					return {status:"clicked", maxpost: 0, comments: 0, popularity: 0};
 					break;
 				case "3":
-					return {status:"interacted", maxpost: 0, comments: 0};
+					return {status:"interacted", maxpost: 0, comments: 0, popularity: 0};
 					break;
 				default:
 					alert("getItem: You should never see this message. Something wrong with localStorage key:" + gotitem);
 					// dummy empty value
-					return {status:"interacted", maxpost: 0, comments: 0};
+					return {status:"interacted", maxpost: 0, comments: 0, popularity: 0};
 			}
 		}
 	}
