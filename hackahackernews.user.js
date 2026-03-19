@@ -76,10 +76,7 @@ function annotate() {
 			break;
 
 		case "item":
-			{
-				const item_element = document.querySelector('.athing:not(.comtr)');
-				item(Number(item_element.id));
-			}
+			item(document.querySelector('.athing:not(.comtr)')?.id);
 			break;
 
 		case "threads":
@@ -216,6 +213,7 @@ function item(item_id) {
 }
 
 function setItem(key, value){
+	if (!key || !Number(key)) return;
 	if (localStorage.getItem(key) == value) return;
 	try {
 		localStorage.setItem(key, value);
