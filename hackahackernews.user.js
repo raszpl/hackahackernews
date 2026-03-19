@@ -72,7 +72,7 @@ function annotate() {
 			}
 
 			// prepare a list of all articles, query their status in our database
-			news(Array.from(document.querySelectorAll('.athing:not(.comtr)'), x => [Number(x.id), x]));
+			news(document.querySelectorAll('.athing:not(.comtr)'));
 			break;
 
 		case "item":
@@ -104,10 +104,10 @@ function annotate() {
 	}
 }
 
-function news(itemarray) {
-	for (let i = 0; i < itemarray.length; i++) {
-		const item_id = itemarray[i][0];
-		const item_element = itemarray[i][1];
+function news(nodelist) {
+	for (let i = 0; i < nodelist.length; i++) {
+		const item_id = Number(nodelist[i].id);
+		const item_element = nodelist[i];
 		const gotItem = getItem(item_id);
 
 		switch(gotItem.status) {
