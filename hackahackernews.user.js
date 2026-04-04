@@ -140,6 +140,8 @@ function news(nodelist) {
 		}
 	}
 	interestListeners();
+	// we dont want to run out of localstorage quota, lets monitor and delete old entries periodically
+	checkquota();
 }
 
 function item(item_id) {
@@ -292,4 +294,52 @@ function interestListeners() {
 	}
 	document.addEventListener("click", storyClick, true);
 	document.addEventListener('auxclick', storyClick, true);
+}
+
+function checkquota(){
+	// localStorage limit is ~5MB, should probably do something about exceeding quota ;)
+	// lets trigger around 4MB
+	// Delete half of the oldest empty(seen, never interacted with) entries first
+	// Pop a warning when we finally reach over 3MB non empty
+	//
+	// total entries: localStorage.length
+	// storage bytes left: 1024 * 1024 * 5 - encodeURIComponent(JSON.stringify(localStorage)).length
+	// non empty entries: Object.entries(localStorage).filter(value => value[1] != "1")
+	// non empty entries size: encodeURIComponent(JSON.stringify(Object.entries(localStorage).filter(value => value[1] != "1"))).length
+	// empty entries sorted, oldest first Object.entries(localStorage).filter(value => value[1] == "1").sort(function (a, b) {return parseInt(a[0]) - parseInt(b[0])});
+
+	//size check is expensive, can be as long as 500ms for full localstorage, limit size checks to ~once per 24h
+	if (GM_getValue("nextquotacheck") > Date.now()) return;
+
+	let size = encodeURIComponent(JSON.stringify(localStorage)).length;
+	console.log("Current size: "+size+" bytes");
+	if (size > 1024 * 1024 * 4) {
+		alert("Current hackahackernews consumed localStorage size: "+size+" bytes, cleaning older entries to make more room.");
+		const sortedStorage = Object.entries(localStorage).filter(value => value[1] == "1").sort(function (a, b) {return parseInt(a[0]) - parseInt(b[0])});
+		let cutout = parseInt(sortedStorage.length/2);
+		for (const [index, value] of sortedStorage.entries()) {
+			if (index < cutout) {
+				localStorage.removeItem(value[0]);
+			}
+		}
+		size = encodeURIComponent(JSON.stringify(localStorage)).length;
+		console.log("Size after culling empty entries: "+size+" bytes");
+		const nonempty = Object.entries(localStorage).filter(value => value[1] != "1");
+		const nonempty_size = encodeURIComponent(JSON.stringify(nonempty)).length;
+		if (nonempty_size > 1024 * 1024 * 3) {
+			console.log("Non empty entries size is still over 3MB! currently at: "+nonempty_size+" bytes.");
+			if (confirm("Saved visited links are consuming "+nonempty_size+" bytes, delete half of the oldest entries?")) {
+				const sortedNonempty = nonempty.sort(function (a, b) {return parseInt(a[0]) - parseInt(b[0])});
+				let cutout = parseInt(sortedNonempty.length/2);
+				for (const [index, value] of sortedNonempty.entries()) {
+					if (index < cutout) {
+						localStorage.removeItem(value[0]);
+					}
+				}
+			}
+		}
+		size = encodeURIComponent(JSON.stringify(localStorage)).length;
+		console.log("Final size after culling: "+size+" bytes");
+	}
+	GM_setValue("nextquotacheck", Date.now()+86400000);
 }
